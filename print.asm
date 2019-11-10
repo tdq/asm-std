@@ -9,15 +9,32 @@ stdin       equ     0
 section .text
 
 ; Clear screen
-clear:
+clear_screen:
     push    rax
     push    rdi
     push    rsi
     push    rdx
     mov     rax, sys_write
     mov     rdi, stdout
-    mov     rsi, clear_msg
-    mov     rdx, 7
+    mov     rsi, clear_screen_msg
+    mov     rdx, clear_screen_len
+    syscall
+    pop     rdx
+    pop     rsi
+    pop     rdi
+    pop     rax
+    ret
+
+; Clears styles
+clear_style:
+    push    rax
+    push    rdi
+    push    rsi
+    push    rdx
+    mov     rax, sys_write
+    mov     rdi, stdout
+    mov     rsi, clear_style_msg
+    mov     rdx, clear_style_len
     syscall
     pop     rdx
     pop     rsi
@@ -177,7 +194,10 @@ section .bss
 
 section .data
 
-clear_msg:
+clear_screen_msg:
     db 27, '[H', 27, '[2J', 0xA
-clear_len       equ $-clear_msg
+    clear_screen_len    equ $-clear_screen_msg
  
+clear_style_msg:
+    db 27, '[0m'
+    clear_style_len     equ $-clear_style_msg
