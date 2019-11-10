@@ -28,20 +28,28 @@ clear:
 ; Print unsigned number
 ; | INPUT
 ; rax = number
-print_number:
+print_decimal:
     push    rax
     push    rbx
     push    rsi
     push    rdx
+    push    rdi
     xor     rsi, rsi
+    xor     rdi, rdi
     cmp     rax, 0
-    jne     .next_iter
+    jg      .next_iter
+    cmp     rax, 0
+    jl      .neg
     mov     rax, '0'
     call    print_char
     jmp     .close
+    .neg:
+        mov     rdi, 1
+        mov     rbx, -1
+        mul     rbx
     .next_iter:
         cmp     rax, 0
-        je      .print_iter
+        je      .print
         mov     rbx, 10
         xor     rdx, rdx
         div     rbx
@@ -49,14 +57,20 @@ print_number:
         push    rdx
         inc     rsi
         jmp     .next_iter
-    .print_iter:
-        cmp     rsi, 0
-        je      .close
-        pop     rax
+    .print:
+        cmp     rdi, 1
+        jne     .print_iter
+        mov     rax, '-'
         call    print_char
-        dec     rsi
-        jmp     .print_iter
+        .print_iter:
+            cmp     rsi, 0
+            je      .close
+            pop     rax
+            call    print_char
+            dec     rsi
+            jmp     .print_iter
     .close:
+        pop     rdi
         pop     rdx
         pop     rsi
         pop     rbx
@@ -145,11 +159,11 @@ set_pos:
     mov     rax, '['
     call    print_char
     mov     rax, rsi
-    call    print_number
+    call    print_decimal
     mov     rax, 59
     call    print_char
     mov     rax, rdi
-    call    print_number
+    call    print_decimal
     mov     rax, 'H'
     call    print_char
     pop     rdi
